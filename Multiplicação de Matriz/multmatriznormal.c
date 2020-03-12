@@ -53,19 +53,30 @@ void multiplica_matrizes(int **matrizmult, int **matriz1, int **matriz2, int lin
 	}
 
 	//Aloca um inteiro auxiliar. Aloquei dinamicamente apenas para teste
-	int *aux = malloc(sizeof(int*));	//Armazena o numero intermediario entre as operações de multiplicação de matrizes
+	/*REVISÃO PONTEIRO:
+		Criei um ponteiro para inteiro, desso modo ele armazena um inteiro apenas. Portanto ele armazena um tamanho de inteiro = sizeof(int)
+		No caso de int **matriz = malloc(sizeof(int*)*linha); a matriz armazenará numa região da memória um ponteiro para diversos ponteiros
+		O-o-{1,2,3} 
+		O-o-{3,4,5}
+		O-o-{6,7,8}
+	*/
+
+	int *aux = malloc(sizeof(int));	//Armazena o numero intermediario entre as operações de multiplicação de matrizes
 									//isto é, ao multiplicar um elemento com outro, armazena o valor nessa variavel,
 									//quando todas as multiplicações fores feitas, ela será inseria na matriz
 									//ACHO que gasta menos'poder computacionar do que um for() que zeraria a matriz 
-	aux = 0; //posso fazer isso?
+	*aux = 0; /*O aux na verdade é um ponteiro. Dessa forma, um ponteiro não pode receber 0, mas o inteiro o qual aponta pode.
+				Para fazermos essa variavel armazenar um valor, devemos "apontar para onde ela está apontando", ou seja, *aux = valor;
+				Dessa maneira, o inteiro ira receber o valor desejado e aux continuará apontando para esse local de memória
+				*/
 
 	for(int i=0; i<linha ; ++i){
 		for(int j=0; j<coluna; ++j){	//deveria ser coluna da matriz 1
 			for(int k=0; k< coluna; ++k){//deveria ser coluna da matriz 2
-				aux += matriz1[i][k] * matriz2[k][j];
+				*aux += matriz1[i][k] * matriz2[k][j];
 			}
-			matrizmult[i][j] = *aux;
-			aux = 0;		//zerar o auxiliar para recomeçar a multiplicação
+			matrizmult[i][j] = *aux;	//Queremos que a matriz receba o valor associado à aux. Portanto, devemos passar *aux, pois caso contrário, estariamos passando seu ponteiro.
+			*aux = 0;		//zerar o auxiliar para recomeçar a multiplicação
 		
 		}
 	}
@@ -86,7 +97,8 @@ void desaloca_matriz(int **matriz, int linha){
 void print_matriz(int **matriz, int linha, int coluna ){
 	for(int i =0; i<linha; ++i){
 		for(int j=0 ; j<coluna; ++j)
-			printf("%d", matriz[i][j]);
+			printf("%d ", matriz[i][j]);
+		printf("\n");
 	}
 
 }
@@ -109,6 +121,7 @@ int main (){
 	multiplica_matrizes(matrizmultiplicada,matriz1, matriz2, linha, coluna);
 
 
+	print_matriz(matrizmultiplicada, linha, coluna);
 	desaloca_matriz(matriz1,linha);
 	desaloca_matriz(matriz2, linha);
 	desaloca_matriz(matrizmultiplicada, linha);
